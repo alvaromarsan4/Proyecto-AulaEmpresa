@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Notas Privadas</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong>🔒 NotasPrivadas</strong></li>
+        </ul>
+        <ul id="nav-user" style="display: none;">
+            <li>Hola, <span id="display-username"></span></li>
+            <li><a href="#" role="button" class="outline" onclick="logout()">Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <!-- Auth Section -->
+        <section id="auth-section">
+            <div class="grid">
+                <div>
+                    <h2>Iniciar Sesión</h2>
+                    <form id="login-form">
+                        <input type="text" id="login-username" placeholder="Usuario" required>
+                        <input type="password" id="login-password" placeholder="Contraseña" required>
+                        <button type="submit">Entrar</button>
+                    </form>
+                </div>
+                <div>
+                    <h2>Registrarse</h2>
+                    <form id="register-form">
+                        <input type="text" id="register-username" placeholder="Usuario" required>
+                        <input type="password" id="register-password" placeholder="Contraseña" required>
+                        <button type="submit" class="secondary">Crear Cuenta</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- App Section -->
+        <section id="app-section" style="display: none;">
+            <div class="grid">
+                <div>
+                    <h2>Tus Notas</h2>
+                </div>
+                <div style="text-align: right;">
+                    <button onclick="showCreateModal()">+ Nueva Nota</button>
+                </div>
+            </div>
+            
+            <div id="notes-container" class="grid">
+                <!-- Notas se cargarán aquí -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for Create/Edit -->
+    <dialog id="note-modal">
+        <article>
+            <header>
+                <a href="#close" aria-label="Close" class="close" onclick="closeModal()"></a>
+                <h3 id="modal-title">Nueva Nota</h3>
+            </header>
+            <form id="note-form">
+                <input type="hidden" id="note-id">
+                <label for="title">Título</label>
+                <input type="text" id="title" name="title" required>
+                <label for="content">Contenido</label>
+                <textarea id="content" name="content" rows="5" required></textarea>
+                <footer>
+                    <button type="button" class="secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit">Guardar</button>
+                </footer>
+            </form>
+        </article>
+    </dialog>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+:root {
+    --primary: #10b981;
+    --primary-hover: #059669;
+}
+
+body {
+    background-color: #0f172a;
+}
+
+nav {
+    border-bottom: 1px solid #1e293b;
+    margin-bottom: 2rem;
+}
+
+#notes-container {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+article.note-card {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 0;
+    transition: transform 0.2s;
+}
+
+article.note-card:hover {
+    transform: translateY(-5px);
+}
+
+.note-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.note-actions button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+#auth-section {
+    max-width: 800px;
+    margin: 5rem auto;
+}
+
+#app-section {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
