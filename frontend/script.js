@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (token) {
         showApp();
     } else {
-        showAuth();
+        showHome();
     }
 });
 
@@ -48,8 +48,8 @@ document.getElementById('register-form').onsubmit = async (e) => {
         });
         const data = await res.json();
         if (res.ok) {
-            alert('¡Cuenta creada! Ya puedes iniciar sesión.');
-            document.getElementById('register-form').reset();
+            alert('¡Cuenta creada e inicio de sesión automático!');
+            login(data.token, data.username);
         } else {
             alert(data.error);
         }
@@ -71,23 +71,40 @@ function logout() {
     currentUser = null;
     localStorage.removeItem('token');
     localStorage.removeItem('username');
-    showAuth();
+    showHome();
 }
 
 // --- View Toggles ---
 
-function showAuth() {
-    document.getElementById('auth-section').style.display = 'block';
-    document.getElementById('app-section').style.display = 'none';
+function showHome() {
+    hideAllSections();
+    document.getElementById('home-section').style.display = 'block';
     document.getElementById('nav-user').style.display = 'none';
 }
 
+function showLogin() {
+    hideAllSections();
+    document.getElementById('login-section').style.display = 'block';
+}
+
+function showRegister() {
+    hideAllSections();
+    document.getElementById('register-section').style.display = 'block';
+}
+
 function showApp() {
-    document.getElementById('auth-section').style.display = 'none';
+    hideAllSections();
     document.getElementById('app-section').style.display = 'block';
     document.getElementById('nav-user').style.display = 'flex';
     document.getElementById('display-username').innerText = currentUser;
     loadNotes();
+}
+
+function hideAllSections() {
+    document.getElementById('home-section').style.display = 'none';
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('register-section').style.display = 'none';
+    document.getElementById('app-section').style.display = 'none';
 }
 
 // --- Note Functions ---
@@ -128,7 +145,7 @@ document.getElementById('note-form').onsubmit = async (e) => {
 
     const res = await fetch(url, {
         method,
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },

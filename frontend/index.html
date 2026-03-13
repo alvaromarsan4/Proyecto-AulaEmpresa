@@ -19,26 +19,48 @@
     </nav>
 
     <main class="container">
-        <!-- Auth Section -->
-        <section id="auth-section">
+        <!-- Home Section -->
+        <section id="home-section">
             <div class="grid">
-                <div>
-                    <h2>Iniciar Sesión</h2>
-                    <form id="login-form">
-                        <input type="text" id="login-username" placeholder="Usuario" required>
-                        <input type="password" id="login-password" placeholder="Contraseña" required>
-                        <button type="submit">Entrar</button>
-                    </form>
-                </div>
-                <div>
-                    <h2>Registrarse</h2>
-                    <form id="register-form">
-                        <input type="text" id="register-username" placeholder="Usuario" required>
-                        <input type="password" id="register-password" placeholder="Contraseña" required>
-                        <button type="submit" class="secondary">Crear Cuenta</button>
-                    </form>
+                <div style="text-align: center; padding: 2rem 0;">
+                    <h1>Bienvenido a NotasPrivadas</h1>
+                    <p>Tu espacio seguro para guardar pensamientos y recordatorios.</p>
+                    <div class="grid">
+                        <button onclick="showLogin()">Iniciar Sesión</button>
+                        <button class="secondary" onclick="showRegister()">Crear Cuenta</button>
+                    </div>
                 </div>
             </div>
+        </section>
+
+        <!-- Login Section -->
+        <section id="login-section" style="display: none;">
+            <article style="max-width: 400px; margin: auto;">
+                <h2>Iniciar Sesión</h2>
+                <form id="login-form">
+                    <input type="text" id="login-username" placeholder="Usuario" required>
+                    <input type="password" id="login-password" placeholder="Contraseña" required>
+                    <button type="submit">Entrar</button>
+                </form>
+                <footer style="text-align: center;">
+                    <a href="#" onclick="showHome()">← Volver al inicio</a>
+                </footer>
+            </article>
+        </section>
+
+        <!-- Register Section -->
+        <section id="register-section" style="display: none;">
+            <article style="max-width: 400px; margin: auto;">
+                <h2>Registrarse</h2>
+                <form id="register-form">
+                    <input type="text" id="register-username" placeholder="Usuario" required>
+                    <input type="password" id="register-password" placeholder="Contraseña" required>
+                    <button type="submit" class="secondary">Crear Cuenta</button>
+                </form>
+                <footer style="text-align: center;">
+                    <a href="#" onclick="showHome()">← Volver al inicio</a>
+                </footer>
+            </article>
         </section>
 
         <!-- App Section -->

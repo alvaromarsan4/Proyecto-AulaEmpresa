@@ -5,146 +5,210 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { nanoid } = require('nanoid');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = 3000;
 const DB_PATH = path.join(__dirname, 'db.json');
-const SECRET_KEY = 'super-secret-key-change-this-in-production'; // Vulnerabilidad: Hardcoded secret
+const SECRET_KEY = 'super-secret-key-change-this-in-production';
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Helper to read/write DB
-const getData = async () => fs.readJson(DB_PATH);
-const saveData = async (data) => fs.writeJson(DB_PATH, data, { spaces: 2 });
+// --- Configuración de Encriptación ---
+const ALGO = 'aes-256-cbc';
+const KEY = crypto.scryptSync(SECRET_KEY, 'salt-notes', 32);
 
-// --- Middlewares ---
+const encrypt = (text) => {
+    if (!text) return text;
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv(ALGO, KEY, iv);
+    let encrypted = cipher.update(String(text), 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return `${iv.toString('hex')}:${encrypted}`;
+};
 
-const authenticate = async (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) return res.status(401).json({ error: 'Acceso denegado. No hay token.' });
-
+const decrypt = (text) => {
+    if (!text || !text.includes(':')) return text;
     try {
-        const decoded = jwt.verify(token, SECRET_KEY);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        res.status(403).json({ error: 'Token inválido o expirado.' });
+        const [ivHex, encryptedHex] = text.split(':');
+        const iv = Buffer.from(ivHex, 'hex');
+        const decipher = crypto.createDecipheriv(ALGO, KEY, iv);
+        let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+    } catch (e) {
+        return text;
     }
+};
+
+// --- Helpers para DB ---
+const getData = async () => {
+    try {
+        if (!await fs.pathExists(DB_PATH)) return { users: [], notes: [] };
+        return await fs.readJson(DB_PATH);
+    } catch (e) {
+        return { users: [], notes: [] };
+    }
+};
+
+const saveData = async (data) => {
+    await fs.writeJson(DB_PATH, data, { spaces: 2 });
 };
 
 // --- AUTH ENDPOINTS ---
 
-app.post('/api/register', async (req, res) => {
-    const { username, password } = req.body;
+app.post('/api/register', async (req, res, next) => {
+    try {
+        let { username, password } = req.body;
+        const db = await getData();
 
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Usuario y contraseña son obligatorios.' });
-    }
+        // Para buscar si el usuario existe, tenemos que desencriptar los nombres guardados
+        if (db.users.find(u => decrypt(u.username) === username)) {
+            return res.status(400).json({ error: 'El usuario ya existe.' });
+        }
 
-    const db = await getData();
-    if (db.users.find(u => u.username === username)) {
-        return res.status(400).json({ error: 'El usuario ya existe.' });
-    }
+        const newUser = {
+            id: encrypt(nanoid()), // ID Encriptado
+            username: encrypt(username), // Username Encriptado
+            password: encrypt(await bcrypt.hash(password, 10)), // Password (Hash + Encriptado)
+            created_at: new Date().toISOString() // Fecha Legible
+        };
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = {
-        id: nanoid(),
-        username,
-        password: hashedPassword,
-        created_at: new Date().toISOString()
-    };
+        db.users.push(newUser);
+        await saveData(db);
 
-    db.users.push(newUser);
-    await saveData(db);
-
-    res.status(201).json({ message: 'Usuario registrado con éxito.' });
+        const token = jwt.sign({ id: decrypt(newUser.id), username: username }, SECRET_KEY);
+        res.status(201).json({ token, username });
+    } catch (err) { next(err); }
 });
 
-app.post('/api/login', async (req, res) => {
-    const { username, password } = req.body;
+app.post('/api/login', async (req, res, next) => {
+    try {
+        let { username, password } = req.body;
+        const db = await getData();
 
-    const db = await getData();
-    const user = db.users.find(u => u.username === username);
+        // Buscamos desencriptando en caliente
+        const user = db.users.find(u => decrypt(u.username) === username);
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.status(401).json({ error: 'Credenciales inválidas.' });
-    }
+        if (!user || !(await bcrypt.compare(password, decrypt(user.password)))) {
+            return res.status(401).json({ error: 'Credenciales inválidas.' });
+        }
 
-    const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: '1h' });
-    res.json({ token, username: user.username });
+        const token = jwt.sign({ id: decrypt(user.id), username: username }, SECRET_KEY);
+        res.json({ token, username });
+    } catch (err) { next(err); }
 });
 
 // --- NOTES ENDPOINTS ---
 
-app.get('/api/notes', authenticate, async (req, res) => {
-    const db = await getData();
-    const userNotes = db.notes.filter(n => n.user_id === req.user.id).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    res.json(userNotes);
+app.get('/api/notes', async (req, res, next) => {
+    // Nota: Aquí asumo que pasas el token por el middleware authenticate
+    // que decodifica el req.user.id original
+    try {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, SECRET_KEY);
+
+        const db = await getData();
+        const userNotes = db.notes
+            .filter(n => decrypt(n.user_id) === decoded.id) // Comparamos ID real vs ID guardado (desencriptado)
+            .map(n => ({
+                id: decrypt(n.id),
+                title: decrypt(n.title),
+                content: decrypt(n.content),
+                created_at: n.created_at, // Se mantiene legible
+                updated_at: n.updated_at
+            }))
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        res.json(userNotes);
+    } catch (err) { res.status(401).send(); }
 });
 
-app.post('/api/notes', authenticate, async (req, res) => {
-    const { title, content } = req.body;
+app.post('/api/notes', async (req, res, next) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, SECRET_KEY);
 
-    if (!title || !content) {
-        return res.status(400).json({ error: 'Título y contenido son obligatorios.' });
-    }
+        let { title, content } = req.body;
+        const db = await getData();
 
-    const db = await getData();
-    const newNote = {
-        id: nanoid(),
-        user_id: req.user.id,
-        title,
-        content,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-    };
+        const newNote = {
+            id: encrypt(nanoid()),      // ID cifrado
+            user_id: encrypt(decoded.id), // Relación de usuario cifrada
+            title: encrypt(title),       // Título cifrado
+            content: encrypt(content),   // Contenido cifrado
+            created_at: new Date().toISOString(), // Legible
+            updated_at: new Date().toISOString()
+        };
 
-    db.notes.push(newNote);
-    await saveData(db);
+        db.notes.push(newNote);
+        await saveData(db);
 
-    res.status(201).json(newNote);
+        res.status(201).json({
+            ...newNote,
+            id: decrypt(newNote.id),
+            title: decrypt(newNote.title),
+            content: decrypt(newNote.content)
+        });
+    } catch (err) { next(err); }
 });
 
-app.put('/api/notes/:id', authenticate, async (req, res) => {
-    const { id } = req.params;
-    const { title, content } = req.body;
+app.put('/api/notes/:id', async (req, res, next) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, SECRET_KEY);
 
-    const db = await getData();
-    const noteIndex = db.notes.findIndex(n => n.id === id && n.user_id === req.user.id);
+        const { id } = req.params;
+        const { title, content } = req.body;
+        const db = await getData();
 
-    if (noteIndex === -1) {
-        return res.status(404).json({ error: 'Nota no encontrada o no tienes permiso.' });
-    }
+        const noteIndex = db.notes.findIndex(n => decrypt(n.id) === id && decrypt(n.user_id) === decoded.id);
 
-    db.notes[noteIndex] = {
-        ...db.notes[noteIndex],
-        title: title || db.notes[noteIndex].title,
-        content: content || db.notes[noteIndex].content,
-        updated_at: new Date().toISOString()
-    };
+        if (noteIndex === -1) {
+            return res.status(404).json({ error: 'Nota no encontrada.' });
+        }
 
-    await saveData(db);
-    res.json(db.notes[noteIndex]);
+        if (title !== undefined) db.notes[noteIndex].title = encrypt(title);
+        if (content !== undefined) db.notes[noteIndex].content = encrypt(content);
+        db.notes[noteIndex].updated_at = new Date().toISOString();
+
+        await saveData(db);
+
+        res.json({
+            id: decrypt(db.notes[noteIndex].id),
+            user_id: decrypt(db.notes[noteIndex].user_id),
+            title: decrypt(db.notes[noteIndex].title),
+            content: decrypt(db.notes[noteIndex].content),
+            created_at: db.notes[noteIndex].created_at,
+            updated_at: db.notes[noteIndex].updated_at
+        });
+    } catch (err) { res.status(401).send(); }
 });
 
-app.delete('/api/notes/:id', authenticate, async (req, res) => {
-    const { id } = req.params;
+app.delete('/api/notes/:id', async (req, res, next) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, SECRET_KEY);
 
-    const db = await getData();
-    const originalLength = db.notes.length;
-    db.notes = db.notes.filter(n => !(n.id === id && n.user_id === req.user.id));
+        const { id } = req.params;
+        const db = await getData();
 
-    if (db.notes.length === originalLength) {
-        return res.status(404).json({ error: 'Nota no encontrada o no tienes permiso.' });
-    }
+        const originalLength = db.notes.length;
+        db.notes = db.notes.filter(n => !(decrypt(n.id) === id && decrypt(n.user_id) === decoded.id));
 
-    await saveData(db);
-    res.status(204).send();
+        if (db.notes.length === originalLength) {
+            return res.status(404).json({ error: 'Nota no encontrada.' });
+        }
+
+        await saveData(db);
+        res.status(204).send();
+    } catch (err) { res.status(401).send(); }
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor escuchando en http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Servidor en http://localhost:${PORT}`));

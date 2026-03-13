@@ -1,4 +1,96 @@
 {
-  "users": [],
-  "notes": []
+  "users": [
+    {
+      "id": "YkIQMo36iBvDL4-v6TvEq",
+      "username": "22",
+      "password": "$2a$10$dxOoZffK2EzvUmUISP/oEuNT7ZzUNzDadKRzUA5ZQKN7nXBwMkrdK",
+      "created_at": "2026-03-13T09:46:59.791Z"
+    },
+    {
+      "id": "xqkUIyQhcsObdvPid0P4n",
+      "username": "1",
+      "password": "$2a$10$IryT3Km/S7qzCeMFX18d6u5esZfPfLoNxI08rMm1CHr1ZR2xY3uUS",
+      "created_at": "2026-03-13T10:33:37.484Z"
+    },
+    {
+      "id": "rA-iUjlPGwDyU8wA3kEQm",
+      "username": "2",
+      "password": "$2a$10$dlQVIn/IUll3mrmJvMY/T.nlL0j9hjImZqQAXmkWTFicF6fSaLGEa",
+      "created_at": "2026-03-13T10:34:45.292Z"
+    },
+    {
+      "id": "ZEjYAdBHwEakETqlOSoS8",
+      "username": "5",
+      "password": "$2a$10$I46X1XBmB6xE1LgmhXIgAuW8B8PjZWODjc2OmPVGVjCvT7Zn/W/OK",
+      "created_at": "2026-03-13T10:35:39.092Z"
+    },
+    {
+      "id": "WOYdxRl0ECTxDAkzM9hEB",
+      "username": "99",
+      "password": "$2a$10$AUlsandLg.5xTb9sTCu2.Of4fvZxgJ3DHOGmhZGFMSWFyZmqHv12y",
+      "created_at": "2026-03-13T10:37:35.638Z"
+    },
+    {
+      "id": "hZrvPntZUohxjiWyjUPJ_",
+      "username": "alvaro",
+      "password": "$2a$10$Be8GyhwUsGR6s0amfqTdu.dY8soX3mBsyZS8Emh/zo1opL/4G1vLG",
+      "created_at": "2026-03-13T10:40:58.285Z"
+    },
+    {
+      "id": "OdCpJjn82jXkiyHE51Lfj",
+      "username": "alvaro 2",
+      "password": "$2a$10$al3otBlJdZ/q5dM.jFBckucGnZaMAVqK82czTBBV.O9ih/QRbFUQm",
+      "created_at": "2026-03-13T10:44:37.026Z"
+    },
+    {
+      "id": "Ku99EH-HWMnLa0ex5GSjZ",
+      "username": "alvaro 23",
+      "password": "$2a$10$kuYK6sDBESGg/3naxKRy6.9PEKdJqFdsfgzZSwq9..fan92OLI3KO",
+      "created_at": "2026-03-13T10:44:56.880Z"
+    },
+    {
+      "id": "g10udTSaA_QoVVZBFBNly",
+      "username": "00",
+      "password": "$2a$10$Hj22IHZVvZLLJBV.zm.zdeCNECfRBfU7pRoehSoiSsbKYebyoFEfm",
+      "created_at": "2026-03-13T10:48:48.041Z"
+    },
+    {
+      "id": "f9d39821c7bf9c9176581d459caedd2a:ba7e77b7a51e1b4cee15e0404ee7b7653ec6d36bf856c23a2b2c6592aa6077c7",
+      "username": "0796d18eb27aee4e1d8182ca65c2e297:9df0225d3fc5709baa06e9f1bf0b7bb5",
+      "password": "7ab4bb4b3b4c1a2eaa6428fab047338e:c35a8c52e44785f4857c2957c84631a61d2a14ede98882ff6eb03593e74598854fbb0bb7ef4e80ba737b20d45cb2508d269738a4f238d1d62965ba3dd0efd74a",
+      "created_at": "2026-03-13T11:02:36.277Z"
+    },
+    {
+      "id": "fb6570e9dbc685a4651fd50706b10c26:5a73587804f98df6362079b21f9c1d9b42d5bc22e10b82d4d3cbe178b78d0e6d",
+      "username": "3d127d6c1a20f977b9f3b6df8051110e:47324708c3acf5e4e45194d823f721dc",
+      "password": "49e339d0705562ebc20aae153b959cb5:31fedcd5f59bb9c229ef27768cfb2d78bd43f1a746e888bcb031b8fc9ded8c6d84bd9f6ab1c0e9a18fe3504515fbc666b82dcd833540865c9cb13a629f9f9833",
+      "created_at": "2026-03-13T11:11:03.172Z"
+    }
+  ],
+  "notes": [
+    {
+      "id": "681188b243da5de107909563a1f3d2ca:336bb143e3f82be1e1259410eeb5623edf247d09d64cfb62f4ad349af79e54e8",
+      "user_id": "4b8ebbd106be030e4976fad085ffc34b:7ea6257e6e0f5504385b4fa8d75855333942a291c220663e1265ccb1cd4d062d",
+      "title": "b4c81eb9f240c3592cfc0421a541f806:4951e2b6e3e3b588ec84456f25f3724d",
+      "content": "6ca4452533db014413005c4d136ee1bb:8aeb0e2e4899e79d46e615bc4ce4f364",
+      "created_at": "2026-03-13T11:05:45.061Z",
+      "updated_at": "2026-03-13T11:05:45.061Z"
+    },
+    {
+      "id": "bf3e98ecc5e6c2ac5e80cda68284fcec:ce2e7db892934cbe710a38080f965cd12443fdb7afe24ae0b0b473f6711b7241",
+      "user_id": "1bbbfa1b67582a7cf9cb2c0811c07170:05c1008efb2cfb979b6bfb96727f68c0bcaaea5eb0e13ef9ca2ba0fd05a16eca",
+      "title": "db84099d2ba973ddd40f6248cbf95bde:bf4bb61bcf349926e449d98c744b8eca",
+      "content": "d6ee5e5e5c51da67368abef523dabc64:9b96ee72a6b343055e3e6dc7f0ed86c8",
+      "created_at": "2026-03-13T11:05:52.949Z",
+      "updated_at": "2026-03-13T11:05:52.949Z"
+    },
+    {
+      "id": "b77b7e3d4d97cee0fba96984eb49fa66:50374abf9fcf621e9ddb0a68a96de6bad0c568fc2c91875caf5876bc45ab7ba0",
+      "user_id": "28d14e544be5b1d88afe8f06faf33ec4:179d98163509331dc5b0f8bb8dd142c5fbd62e8fc9170cb631f35c7839b34a4f",
+      "title": "f37a6ab1395b270b40c4885805765172:54bccdb497adc5ce0478c6060c8479e8",
+      "content": "d63d1514b5f948c3f76c98b5427cfce1:856a19788f78c66f6e377e330bab4e3f",
+      "created_at": "2026-03-13T11:06:15.664Z",
+      "updated_at": "2026-03-13T11:06:15.665Z"
+    }
+  ]
 }
